@@ -23,7 +23,9 @@ const Dashboard = () => {
     conversion: '0%'
   });
   const [recentLeads, setRecentLeads] = useState([]);
+  const [sourceData, setSourceData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -42,6 +44,15 @@ const Dashboard = () => {
 
       setStats({ total, active, pending, conversion });
       setRecentLeads(data.slice(0, 5));
+
+      // Calculate Sources
+      const sources = {};
+      data.forEach(l => {
+        const s = l.source || 'DIRECT';
+        sources[s] = (sources[s] || 0) + 1;
+      });
+      setSourceData(Object.entries(sources).map(([name, count]) => ({ name, count })));
+
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -183,8 +194,25 @@ const Dashboard = () => {
           </div>
 
           {/* Quick Actions / Activity Feed */}
-          <div className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-secondary/5 shadow-sm">
-            <h3 className="text-2xl font-black text-secondary-900 mb-8">System Activity</h3>
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-secondary/5 shadow-sm space-y-10">
+            <div>
+              <h3 className="text-2xl font-black text-secondary-900 mb-6">Lead Sources</h3>
+              <div className="space-y-4">
+                {sourceData.map((src, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <p className="text-[10px] font-black text-secondary/60 uppercase tracking-widest">{src.name}</p>
+                    </div>
+                    <p className="text-sm font-black text-secondary-900">{src.count}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-black text-secondary-900 mb-8">System Activity</h3>
+
             <div className="space-y-8 relative">
               <div className="absolute left-[23px] top-4 bottom-4 w-px bg-secondary/5"></div>
               

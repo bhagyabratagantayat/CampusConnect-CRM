@@ -147,6 +147,37 @@ const getActivitiesByLeadId = async (leadId) => {
   return result.rows;
 };
 
+const importLeads = async (leads, user) => {
+  let importedCount = 0;
+  let skippedCount = 0;
+
+  for (const lead of leads) {
+    // Basic deduplication
+    const dup = await db.query('SELECT id FROM leads WHERE phone = $1 OR email = $2', [lead.phone, lead.email]);
+    
+    if (dup.rows.length === 0) {
+      const result = await db.query(
+        'INSERT INTO leads (full_name, phone, email, course_interested, city, state, source, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+        [lead.full_name, lead.phone, lead.email, lead.course_interested, lead.city, lead.state, lead.source || 'CSV_IMPORT', 'NEW']
+      );
+      
+      const leadId = result.rows[0].id;
+      
+      // Log activity
+      await db.query(
+        'INSERT INTO activities (lead_id, activity_type, description) VALUES ($1, $2, $3)',
+        [leadId, 'LEAD_CAPTURED', `Lead imported via CSV by ${user.fullName}`]
+      );
+
+      importedCount++;
+    } else {
+      skippedCount++;
+    }
+  }
+
+  return { imported: importedCount, skipped: skippedCount };
+};
+
 module.exports = {
   getAllLeads,
   getLeadById,
@@ -155,5 +186,7 @@ module.exports = {
   deleteLead,
   getFollowupsByLeadId,
   createFollowup,
-  getActivitiesByLeadId
+  getActivitiesByLeadId,
+  importLeads
 };
+

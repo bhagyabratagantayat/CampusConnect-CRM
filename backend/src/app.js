@@ -5,6 +5,8 @@ const authRoutes = require('./routes/authRoutes');
 const automationRoutes = require('./routes/automationRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+
 
 const app = express();
 
@@ -14,7 +16,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.use('/api/public', publicRoutes);
 app.use('/api/auth', authRoutes);
+
 app.use('/api/leads', leadRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/emails', emailRoutes);

@@ -16,5 +16,7 @@ router.put('/:id', roleMiddleware(['ADMIN', 'MANAGER', 'COUNSELOR']), leadContro
 router.delete('/:id', roleMiddleware(['ADMIN', 'MANAGER']), leadController.deleteLead);
 
 router.post('/:id/followups', roleMiddleware(['ADMIN', 'MANAGER', 'COUNSELOR']), leadController.createFollowup);
+router.post('/import', roleMiddleware(['ADMIN', 'MANAGER']), leadController.importLeads);
 
 module.exports = router;
+

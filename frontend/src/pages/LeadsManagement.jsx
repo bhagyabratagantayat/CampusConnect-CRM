@@ -6,7 +6,8 @@ import LeadFilters from '../components/LeadFilters';
 import Pagination from '../components/Pagination';
 import Button from '../components/Button';
 import EditLeadModal from '../components/EditLeadModal';
-import { Plus, Download } from 'lucide-react';
+import { Plus, Download, FileUp } from 'lucide-react';
+
 import { leadService } from '../services/api';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -128,11 +129,17 @@ const LeadsManagement = () => {
             <Button variant="outline" className="gap-2 font-bold shadow-sm">
               <Download size={18} /> Export
             </Button>
+            <Link to="/leads/import">
+              <Button variant="outline" className="gap-2 font-bold shadow-sm">
+                <FileUp size={18} /> Bulk Import
+              </Button>
+            </Link>
             <Link to="/leads/add">
               <Button className="gap-2 font-bold shadow-lg shadow-primary/20">
                 <Plus size={18} /> Add New Lead
               </Button>
             </Link>
+
           </div>
         </div>
 

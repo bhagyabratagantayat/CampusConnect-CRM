@@ -13,7 +13,11 @@ import UsersManagement from '../pages/UsersManagement';
 import Automation from '../pages/Automation';
 import EmailLogs from '../pages/EmailLogs';
 import AIChat from '../pages/AIChat';
+import InquiryForm from '../pages/InquiryForm';
+import CSVImport from '../pages/CSVImport';
 import Settings from '../pages/Settings';
+
+
 
 
 import Login from '../pages/Login';
@@ -26,6 +30,8 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+      <Route path="/inquiry" element={<InquiryForm />} />
+
 
       {/* Protected Routes */}
       <Route 
@@ -52,6 +58,15 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/leads/import" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+            <CSVImport />
+          </ProtectedRoute>
+        } 
+      />
+
       <Route 
         path="/leads/:id" 
         element={
