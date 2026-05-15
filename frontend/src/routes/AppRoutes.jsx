@@ -15,7 +15,11 @@ import EmailLogs from '../pages/EmailLogs';
 import AIChat from '../pages/AIChat';
 import InquiryForm from '../pages/InquiryForm';
 import CSVImport from '../pages/CSVImport';
+import CallQueue from '../pages/CallQueue';
+import CallLogs from '../pages/CallLogs';
+import VoiceSettings from '../pages/VoiceSettings';
 import Settings from '../pages/Settings';
+
 
 
 
@@ -117,6 +121,31 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/calls" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'COUNSELOR']}>
+            <CallQueue />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/call-logs" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'COUNSELOR']}>
+            <CallLogs />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/call-settings" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+            <VoiceSettings />
+          </ProtectedRoute>
+        } 
+      />
+
 
 
       <Route 

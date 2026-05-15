@@ -11,8 +11,11 @@ import {
   ShieldCheck,
   Zap,
   Mail,
-  BrainCircuit
+  BrainCircuit,
+  PhoneCall,
+  History
 } from 'lucide-react';
+
 import { cn } from '../utils/cn';
 
 const allMenuItems = [
@@ -21,7 +24,10 @@ const allMenuItems = [
   { icon: UserPlus, label: 'Add Lead', path: '/leads/add', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
   { icon: CalendarClock, label: 'Followups', path: '/followups', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
   { icon: BrainCircuit, label: 'AI Assistant', path: '/ai-chat', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
+  { icon: PhoneCall, label: 'Live Calls', path: '/calls', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
+  { icon: History, label: 'Call Logs', path: '/call-logs', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
   { icon: Zap, label: 'Automation', path: '/automation', roles: ['ADMIN', 'MANAGER'] },
+
   { icon: Mail, label: 'Email Logs', path: '/email-logs', roles: ['ADMIN', 'MANAGER'] },
   { icon: Users, label: 'Users', path: '/users', roles: ['ADMIN', 'MANAGER'] },
   { icon: Settings, label: 'Settings', path: '/settings', roles: ['ADMIN'] },

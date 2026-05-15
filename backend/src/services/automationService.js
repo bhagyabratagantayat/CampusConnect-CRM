@@ -67,6 +67,21 @@ const executeRule = async (rule, payload) => {
         result = emailResult.success ? `Email sent (${action_config.template})` : `Email failed: ${emailResult.error}`;
         break;
 
+      case 'ENQUEUE_CALL':
+        // If status matches config (optional filter)
+        if (action_config.status && payload.status !== action_config.status) {
+          result = 'Skipped: status mismatch';
+          break;
+        }
+        const priority = action_config.priority || 1;
+        await db.query(
+          'INSERT INTO call_queue (lead_id, priority, call_status) VALUES ($1, $2, $3)',
+          [leadId, priority, 'PENDING']
+        );
+        result = `Lead enqueued for AI Call (Priority: ${priority})`;
+        break;
+
+
 
 
       default:

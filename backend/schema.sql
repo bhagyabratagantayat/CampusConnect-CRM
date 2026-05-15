@@ -2,6 +2,10 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Drop tables if they exist
+DROP TABLE IF EXISTS voice_settings;
+DROP TABLE IF EXISTS call_logs;
+DROP TABLE IF EXISTS call_queue;
+DROP TABLE IF EXISTS call_campaigns;
 DROP TABLE IF EXISTS conversation_summaries;
 DROP TABLE IF EXISTS messages;
 DROP TABLE IF EXISTS conversations;
@@ -99,7 +103,7 @@ CREATE TABLE email_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- AI TABLES
+-- AI & KNOWLEDGE BASE
 CREATE TABLE knowledge_base (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category VARCHAR(100),
@@ -135,6 +139,54 @@ CREATE TABLE conversation_summaries (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- VOICE INFRASTRUCTURE
+CREATE TABLE call_campaigns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'ACTIVE',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE call_queue (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
+    priority INTEGER DEFAULT 1,
+    scheduled_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    retry_count INTEGER DEFAULT 0,
+    max_retries INTEGER DEFAULT 3,
+    call_status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, IN_PROGRESS, COMPLETED, FAILED, CANCELLED
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE call_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    lead_id UUID REFERENCES leads(id) ON DELETE SET NULL,
+    provider_name VARCHAR(100),
+    provider_call_id VARCHAR(255),
+    call_status VARCHAR(50),
+    start_time TIMESTAMP WITH TIME ZONE,
+    end_time TIMESTAMP WITH TIME ZONE,
+    duration_seconds INTEGER,
+    outcome VARCHAR(100),
+    transcript TEXT,
+    ai_summary TEXT,
+    detected_intent VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE voice_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    provider_name VARCHAR(100) DEFAULT 'EXOTEL',
+    voice_language VARCHAR(50) DEFAULT 'en-IN',
+    retry_enabled BOOLEAN DEFAULT TRUE,
+    max_retries INTEGER DEFAULT 3,
+    call_timeout_seconds INTEGER DEFAULT 60,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_leads_counselor_id ON leads(counselor_id);
@@ -142,6 +194,8 @@ CREATE INDEX idx_automation_trigger ON automation_rules(trigger_event);
 CREATE INDEX idx_email_logs_lead_id ON email_logs(lead_id);
 CREATE INDEX idx_kb_category ON knowledge_base(category);
 CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
+CREATE INDEX idx_call_queue_status ON call_queue(call_status);
+CREATE INDEX idx_call_logs_lead_id ON call_logs(lead_id);
 
 -- Trigger for updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -171,7 +225,9 @@ INSERT INTO automation_rules (name, trigger_event, action_type, action_config) V
 ('Missed Followup Detector', 'FOLLOWUP_MISSED', 'CREATE_ACTIVITY', '{"template": "CRITICAL: Followup was missed by counselor"}'),
 ('Welcome Email on Inquiry', 'LEAD_CREATED', 'SEND_EMAIL', '{"template": "WELCOME_INQUIRY"}'),
 ('Admin Alert on New Lead', 'LEAD_CREATED', 'SEND_EMAIL', '{"template": "ADMIN_NEW_LEAD", "to_admin": true}'),
-('Brochure Email for Interested', 'LEAD_STATUS_CHANGED', 'SEND_EMAIL', '{"status": "INTERESTED", "template": "BROCHURE_DETAILS"}');
+('Brochure Email for Interested', 'LEAD_STATUS_CHANGED', 'SEND_EMAIL', '{"status": "INTERESTED", "template": "BROCHURE_DETAILS"}'),
+('Auto AI Call on New Lead', 'LEAD_CREATED', 'ENQUEUE_CALL', '{"priority": 1}'),
+('Retry Call on No Response', 'LEAD_STATUS_CHANGED', 'ENQUEUE_CALL', '{"status": "NO_RESPONSE", "priority": 2}');
 
 -- Seed Knowledge Base
 INSERT INTO knowledge_base (category, title, content) VALUES 
@@ -181,3 +237,6 @@ INSERT INTO knowledge_base (category, title, content) VALUES
 ('ELIGIBILITY', 'Admission Criteria', 'For B.Tech, student must have 60% in Physics, Chemistry, and Math. JEE Mains score is preferred but not mandatory.'),
 ('PLACEMENT', 'Placement Statistics 2024', 'Highest Package: ₹45 LPA (Microsoft). Average Package: ₹8.5 LPA. Over 200+ recruiters visit every year.'),
 ('DOCUMENTS', 'Required Documents', 'Original 10th & 12th Marksheets, Migration Certificate, Adhaar Card, 5 Passport size photos, and Character Certificate.');
+
+-- Seed Voice Settings
+INSERT INTO voice_settings (provider_name, voice_language) VALUES ('EXOTEL', 'en-IN');

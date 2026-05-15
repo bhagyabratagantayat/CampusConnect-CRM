@@ -6,6 +6,8 @@ const automationRoutes = require('./routes/automationRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const publicRoutes = require('./routes/publicRoutes');
+const callRoutes = require('./routes/callRoutes');
+
 
 
 const app = express();
@@ -23,6 +25,8 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/calls', callRoutes);
+
 
 
 

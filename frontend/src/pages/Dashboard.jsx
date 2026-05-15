@@ -242,7 +242,10 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </div>
+  </MainLayout>
+
+
   );
 };
 
