@@ -2,8 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const leadRoutes = require('./routes/leadRoutes');
 const authRoutes = require('./routes/authRoutes');
+const automationRoutes = require('./routes/automationRoutes');
+const emailRoutes = require('./routes/emailRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
+
 
 // Middleware
 app.use(cors());
@@ -12,6 +16,12 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/automation', automationRoutes);
+app.use('/api/emails', emailRoutes);
+app.use('/api/ai', aiRoutes);
+
+
+
 
 
 // Health check

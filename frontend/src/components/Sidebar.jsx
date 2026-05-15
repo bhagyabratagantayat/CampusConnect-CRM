@@ -8,7 +8,10 @@ import {
   CalendarClock, 
   Settings, 
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  Mail,
+  BrainCircuit
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -17,9 +20,15 @@ const allMenuItems = [
   { icon: Users, label: 'Leads', path: '/leads', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
   { icon: UserPlus, label: 'Add Lead', path: '/leads/add', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
   { icon: CalendarClock, label: 'Followups', path: '/followups', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
+  { icon: BrainCircuit, label: 'AI Assistant', path: '/ai-chat', roles: ['ADMIN', 'MANAGER', 'COUNSELOR'] },
+  { icon: Zap, label: 'Automation', path: '/automation', roles: ['ADMIN', 'MANAGER'] },
+  { icon: Mail, label: 'Email Logs', path: '/email-logs', roles: ['ADMIN', 'MANAGER'] },
   { icon: Users, label: 'Users', path: '/users', roles: ['ADMIN', 'MANAGER'] },
   { icon: Settings, label: 'Settings', path: '/settings', roles: ['ADMIN'] },
 ];
+
+
+
 
 const Sidebar = ({ isCollapsed }) => {
   const { user, logout } = useAuth();

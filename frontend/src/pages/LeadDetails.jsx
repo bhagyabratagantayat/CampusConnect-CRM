@@ -15,7 +15,8 @@ import {
   Calendar, 
   UserPlus, 
   Plus,
-  History
+  History,
+  Mail
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -121,6 +122,16 @@ const LeadDetails = () => {
       fetchLeadDetails();
     } catch (error) {
       toast.error('Failed to schedule followup');
+    }
+  };
+
+  const handleSendEmail = async (templateName) => {
+    try {
+      await api.post('/emails/send', { leadId: id, templateName });
+      toast.success('Email sent successfully!');
+      fetchLeadDetails(); // Refresh activities to see the email log
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send email');
     }
   };
 
@@ -254,11 +265,19 @@ const LeadDetails = () => {
             <div className="glass p-6 rounded-3xl border border-white/40 shadow-sm">
               <h3 className="text-sm font-black text-secondary-900 uppercase tracking-widest mb-6">Quick Management</h3>
               <div className="grid grid-cols-1 gap-3">
-                <Button variant="outline" className="justify-start gap-3 h-12 border-secondary/5 hover:bg-secondary/5">
-                  <UserPlus size={18} className="text-primary" /> Assign Counselor
+                <Button 
+                  variant="outline" 
+                  className="justify-start gap-3 h-12 border-secondary/5 hover:bg-secondary/5"
+                  onClick={() => handleSendEmail('WELCOME_INQUIRY')}
+                >
+                  <Mail size={18} className="text-primary" /> Send Welcome Email
                 </Button>
-                <Button variant="outline" className="justify-start gap-3 h-12 border-secondary/5 hover:bg-secondary/5">
-                  <Calendar size={18} className="text-accent" /> Schedule Visit
+                <Button 
+                  variant="outline" 
+                  className="justify-start gap-3 h-12 border-secondary/5 hover:bg-secondary/5"
+                  onClick={() => handleSendEmail('BROCHURE_DETAILS')}
+                >
+                  <Mail size={18} className="text-accent" /> Send Brochure
                 </Button>
                 <Button variant="outline" className="justify-start gap-3 h-12 border-secondary/5 hover:bg-secondary/5 text-danger hover:text-danger hover:bg-danger/5">
                   <Plus size={18} className="rotate-45" /> Mark as Lost

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from '../components/ProtectedRoute';
+import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from '../context/AuthContext';
 
 // Pages
 import Dashboard from '../pages/Dashboard';
@@ -9,16 +10,22 @@ import AddLead from '../pages/AddLead';
 import LeadDetails from '../pages/LeadDetails';
 import Followups from '../pages/Followups';
 import UsersManagement from '../pages/UsersManagement';
+import Automation from '../pages/Automation';
+import EmailLogs from '../pages/EmailLogs';
+import AIChat from '../pages/AIChat';
 import Settings from '../pages/Settings';
+
+
 import Login from '../pages/Login';
 import NotFound from '../pages/NotFound';
 
 const AppRoutes = () => {
+  const { user } = useAuth();
+
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/unauthorized" element={<div className="flex items-center justify-center h-screen font-bold text-2xl">Access Denied</div>} />
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
 
       {/* Protected Routes */}
       <Route 
@@ -40,7 +47,7 @@ const AppRoutes = () => {
       <Route 
         path="/leads/add" 
         element={
-          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'COUNSELOR']}>
+          <ProtectedRoute>
             <AddLead />
           </ProtectedRoute>
         } 
@@ -56,11 +63,13 @@ const AppRoutes = () => {
       <Route 
         path="/followups" 
         element={
-          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'COUNSELOR']}>
+          <ProtectedRoute>
             <Followups />
           </ProtectedRoute>
         } 
       />
+      
+      {/* Admin/Manager Only Routes */}
       <Route 
         path="/users" 
         element={
@@ -69,6 +78,32 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/automation" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+            <Automation />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/email-logs" 
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+            <EmailLogs />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/ai-chat" 
+        element={
+          <ProtectedRoute>
+            <AIChat />
+          </ProtectedRoute>
+        } 
+      />
+
+
       <Route 
         path="/settings" 
         element={

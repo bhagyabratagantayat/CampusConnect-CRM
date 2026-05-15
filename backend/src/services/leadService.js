@@ -1,6 +1,8 @@
 const db = require('../config/db');
+const automationService = require('./automationService');
 
 const getAllLeads = async (user) => {
+
   let query = 'SELECT * FROM leads';
   let params = [];
 
@@ -53,14 +55,18 @@ const createLead = async (leadData, user) => {
   ];
 
   const result = await db.query(query, values);
+  const newLead = result.rows[0];
   
   // Log activity
   await db.query(
     'INSERT INTO activities (lead_id, activity_type, description) VALUES ($1, $2, $3)',
-    [result.rows[0].id, 'LEAD_CREATED', `Lead created by ${user.fullName} (${user.role})`]
+    [newLead.id, 'LEAD_CREATED', `Lead created by ${user.fullName} (${user.role})`]
   );
 
-  return result.rows[0];
+  // Trigger Automation
+  await automationService.trigger('LEAD_CREATED', newLead);
+
+  return newLead;
 };
 
 const updateLead = async (id, leadData, user) => {
@@ -87,6 +93,7 @@ const updateLead = async (id, leadData, user) => {
   ];
 
   const result = await db.query(query, values);
+  const updatedLead = result.rows[0];
 
   // Log activity
   await db.query(
@@ -94,7 +101,12 @@ const updateLead = async (id, leadData, user) => {
     [id, 'LEAD_UPDATED', `Lead updated by ${user.fullName}`]
   );
 
-  return result.rows[0];
+  // Trigger Automation (e.g. for status changes)
+  if (currentLead.status !== status) {
+    await automationService.trigger('LEAD_STATUS_CHANGED', updatedLead);
+  }
+
+  return updatedLead;
 };
 
 const deleteLead = async (id, user) => {
@@ -123,6 +135,9 @@ const createFollowup = async (followupData, user) => {
     'INSERT INTO activities (lead_id, activity_type, description) VALUES ($1, $2, $3)',
     [leadId, 'FOLLOWUP_CREATED', `Followup scheduled by ${user.fullName}`]
   );
+
+  // Trigger Automation
+  await automationService.trigger('FOLLOWUP_CREATED', { leadId, followupDate });
 
   return result.rows[0];
 };
